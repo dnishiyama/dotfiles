@@ -107,3 +107,14 @@ if _exists zoxide; then
 fi
 
 # DNISHIYAMA ALIASES
+
+# function to make "cd"ing more efficient
+c() { cd "$@" && ll; }
+
+# Alias to help with vim
+if type nvim > /dev/null 2>&1; then
+  alias v='nvim'
+  alias vim='nvim'
+else
+  alias v='vim'
+fi
