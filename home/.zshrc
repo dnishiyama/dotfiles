@@ -37,6 +37,9 @@ unsetopt HIST_IGNORE_ALL_DUPS
 # Environment
 # ------------------------------------------------------------------------------
 
+# Vim keybindings
+bindkey -v
+
 # Export path to root of dotfiles repo
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
@@ -110,12 +113,15 @@ export TIMEFMT=$'\n================\nCPU\t%P\nuser\t%*U\nsystem\t%*S\ntotal\t%*E
 # ------------------------------------------------------------------------------
 ZSH_DISABLE_COMPFIX=true
 
+# Make it quiet for ssh-agent
+zstyle :omz:plugins:ssh-agent quiet yes
+
 # Autoload node version when changing cwd
 zstyle ':omz:plugins:nvm' autoload true
 
 # Use passphase from macOS keychain
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  zstyle :omz:plugins:ssh-agent ssh-add-args --apple-load-keychain
+  zstyle :omz:plugins:ssh-agent ssh-add-args --apple-load-keychain >/dev/null 2>&1
 fi
 
 # ------------------------------------------------------------------------------
@@ -133,6 +139,7 @@ ZGEN_RESET_ON_CHANGE=(
 
 # Load zgen
 source "${HOME}/.zgen/zgen.zsh"
+
 
 # Load zgen init script
 if ! zgen saved; then
@@ -169,6 +176,7 @@ if ! zgen saved; then
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions
+    zgen load jeffreytse/zsh-vi-mode
     
     # Files
     zgen load $DOTFILES/lib
