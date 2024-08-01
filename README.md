@@ -1,3 +1,10 @@
+# DNISHIYAMA Notes
+
+- Install zoxide (z replacement; aliased on cd)
+- zoxide import --from z ~/.z --merge
+- Install eza (ls improvements)
+- update HISTFILE=~/projects/run_commands/zsh_history in home/.zshrc if necessary
+
 # Denys Dovhan’s dotfiles
 
 <p align="center">

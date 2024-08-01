@@ -86,6 +86,9 @@ if _exists eza; then
   unalias l
   alias l='ls -l'
   alias la='ls -lAh'
+  alias ll='ls -alF' # can't use h flag with eza
+else 
+  alias ll='ls -alFh' # use h for human readable sizes
 fi
 
 # cat with syntax highlighting
@@ -102,3 +105,5 @@ fi
 if _exists zoxide; then
   alias cd='z'
 fi
+
+# DNISHIYAMA ALIASES
