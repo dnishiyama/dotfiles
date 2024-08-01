@@ -58,6 +58,7 @@ _extend_path() {
 }
 
 # Add custom bin to $PATH
+_extend_path "/opt/homebrew/bin" # Add homebrew
 _extend_path "$HOME/.local/bin"
 _extend_path "$DOTFILES/bin"
 _extend_path "$HOME/.npm-global/bin"
