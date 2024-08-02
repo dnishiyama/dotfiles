@@ -1,7 +1,3 @@
-# Amazon Q pre block. Keep at the top of this file.
-# [[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
-# ------------------------------------------------------------------------------
-
 #
 # ~/.zshrc
 #
@@ -37,9 +33,6 @@ unsetopt HIST_IGNORE_ALL_DUPS
 # Environment
 # ------------------------------------------------------------------------------
 
-# Vim keybindings
-bindkey -v
-
 # Export path to root of dotfiles repo
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
@@ -69,6 +62,10 @@ _extend_path "$HOME/.rvm/bin"
 _extend_path "$HOME/.yarn/bin"
 _extend_path "$HOME/.config/yarn/global/node_modules/.bin"
 _extend_path "$HOME/.bun/bin"
+# https://github.com/rbenv/rbenv
+# Needed for ios pod installs
+# https://stackoverflow.com/questions/64901180/how-to-run-cocoapods-on-apple-silicon-m1?rq=3
+_extend_path "$HOME/.rbenv/bin"
 
 # Extend $NODE_PATH
 if [ -d ~/.npm-global ]; then
@@ -168,6 +165,7 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/docker-compose
     zgen oh-my-zsh plugins/node
     zgen oh-my-zsh plugins/deno
+    zgen oh-my-zsh plugins/rbenv
 
     # Custom plugins
     zgen load chriskempson/base16-shell
@@ -240,5 +238,7 @@ fi
 
 # ------------------------------------------------------------------------------
 
-# Amazon Q post block. Keep at the bottom of this file.
-# [[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
+# Initialize fzf after zsh-vi-mode
+# https://github.com/jeffreytse/zsh-vi-mode/issues/24
+# Recommendation from Claude 3.5
+zvm_after_init_commands+=('source ~/.fzf.zsh')
