@@ -166,13 +166,14 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/node
     zgen oh-my-zsh plugins/deno
     zgen oh-my-zsh plugins/rbenv
+    zgen oh-my-zsh plugins/per-directory-history
 
     # Custom plugins
     zgen load chriskempson/base16-shell
     zgen load djui/alias-tips
 
     # Your zsh-notify configuration here
-    if [[ "$TERM_PROGRAM" != "vscode" ]]; then
+    if [[ "$TERM_PROGRAM" != "vscode" && -n "$TERM_PROGRAM" ]]; then
       zgen load marzocchi/zsh-notify
     fi
     zgen load hlissner/zsh-autopair
@@ -245,4 +246,8 @@ fi
 # Initialize fzf after zsh-vi-mode
 # https://github.com/jeffreytse/zsh-vi-mode/issues/24
 # Recommendation from Claude 3.5
+# AND THEN initialize per-directory-history
+HISTORY_START_WITH_GLOBAL=true
 zvm_after_init_commands+=('source ~/.fzf.zsh')
+# Claude 3.5 recommendation to get ^G to work for insert mode in vi when first loading the directory
+zvm_after_init_commands+=('bindkey -M viins "^G" per-directory-history-toggle-history')
