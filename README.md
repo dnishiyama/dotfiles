@@ -3,6 +3,7 @@
 - Install zoxide (z replacement; aliased on cd)
 - zoxide import --from z ~/.z --merge
 - Install eza (ls improvements)
+- Switch terminal (iTerm and VS Code) font to FiraCode Nerd Font Mono - https://www.nerdfonts.com/font-downloads (for ll icons)
 - update HISTFILE=~/projects/run_commands/zsh_history in home/.zshrc if necessary
 
 # Denys Dovhan’s dotfiles

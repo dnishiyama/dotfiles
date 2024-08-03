@@ -170,7 +170,11 @@ if ! zgen saved; then
     # Custom plugins
     zgen load chriskempson/base16-shell
     zgen load djui/alias-tips
-    zgen load marzocchi/zsh-notify
+
+    # Your zsh-notify configuration here
+    if [[ "$TERM_PROGRAM" != "vscode" ]]; then
+      zgen load marzocchi/zsh-notify
+    fi
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions
