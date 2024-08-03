@@ -241,6 +241,20 @@ if [[ -f "$HOME/.zshlocal" ]]; then
   source "$HOME/.zshlocal"
 fi
 
+# Get all the DGN secrets
+if [ -f ~/.dgn_secrets ]; then
+  set -o allexport
+  source ~/.dgn_secrets
+  set +o allexport
+fi
+
+if [ -f ~/.dgn_exports ]; then
+  set -o allexport
+  source ~/.dgn_exports
+  set +o allexport
+fi
+
+
 # ------------------------------------------------------------------------------
 
 # Initialize fzf after zsh-vi-mode
