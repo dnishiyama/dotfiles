@@ -66,6 +66,13 @@ _extend_path "$HOME/.bun/bin"
 # Needed for ios pod installs
 # https://stackoverflow.com/questions/64901180/how-to-run-cocoapods-on-apple-silicon-m1?rq=3
 _extend_path "$HOME/.rbenv/bin"
+export PYENV_ROOT="$HOME/.pyenv"
+_extend_path "$PYENV_ROOT/bin"
+
+# Pyenv (must be before oh-my-zsh plugin)
+if command -v pyenv >/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
 
 # Extend $NODE_PATH
 if [ -d ~/.npm-global ]; then
@@ -167,6 +174,7 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/deno
     zgen oh-my-zsh plugins/rbenv
     zgen oh-my-zsh plugins/per-directory-history
+    zgen oh-my-zsh plugins/pyenv
 
     # Custom plugins
     zgen load chriskempson/base16-shell

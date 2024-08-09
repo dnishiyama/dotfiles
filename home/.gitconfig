@@ -118,3 +118,6 @@
 #   email = denysdovhan@gmail.com
 [include]
   path = ~/.gitlocal
+[user]
+	email = declan@mountaindev.com
+	name = Declan Nishiyama
