@@ -178,7 +178,7 @@ if ! zgen saved; then
 
     # Custom plugins
     zgen load chriskempson/base16-shell
-    zgen load djui/alias-tips
+    # zgen load djui/alias-tips
 
     # Your zsh-notify configuration here
     if [[ "$TERM_PROGRAM" != "vscode" && -n "$TERM_PROGRAM" ]]; then

@@ -118,3 +118,56 @@ if type nvim > /dev/null 2>&1; then
 else
   alias v='vim'
 fi
+
+# Environment managment to set DOTENV_KEY and run a command for a specific environment
+with-env() {
+    local env="$1"
+    shift  # Remove the first argument (environment) from the argument list
+
+    # Check if a command was provided
+    if [ $# -eq 0 ]; then
+        echo "Usage: with-$env <command>"
+        return 1
+    fi
+
+    # Only prompt for confirmation if the environment is production
+    if [ "$env" = "production" ]; then
+        echo -n "Are you sure you want to set dotenv_key for PRODUCTION and run the command? (y/n) "
+        read -r response
+
+        if [[ ! "$response" =~ ^[Yy]$ ]]; then
+            echo "Operation cancelled."
+            return 1
+        fi
+    fi
+
+    # Set DOTENV_KEY
+    DOTENV_KEY=$(npx dotenv-vault keys "$env")
+    
+    if [ $? -eq 0 ]; then
+        echo "DOTENV_KEY has been set for $env environment."
+        
+        # Run the provided command
+        echo "Running command: $@"
+        "$@"
+    else
+        echo "Failed to set DOTENV_KEY. Command not executed."
+    fi
+}
+
+# Specific functions for each environment
+with-dev() {
+    with-env "development" "$@"
+}
+
+with-ci() {
+    with-env "ci" "$@"
+}
+
+with-staging() {
+    with-env "staging" "$@"
+}
+
+with-prod() {
+    with-env "production" "$@"
+}
