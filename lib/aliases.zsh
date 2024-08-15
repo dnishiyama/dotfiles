@@ -142,14 +142,14 @@ with-env() {
     fi
 
     # Set DOTENV_KEY
-    DOTENV_KEY=$(npx dotenv-vault keys "$env")
+    # DOTENV_KEY=$(npx dotenv-vault keys "$env")
     
     if [ $? -eq 0 ]; then
         echo "DOTENV_KEY has been set for $env environment."
         
         # Run the provided command
         echo "Running command: $@"
-        "$@"
+        DOTENV_KEY=$(npx dotenv-vault keys "$env") "$@"
     else
         echo "Failed to set DOTENV_KEY. Command not executed."
     fi
