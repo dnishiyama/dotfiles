@@ -68,6 +68,8 @@ _extend_path "$HOME/.bun/bin"
 _extend_path "$HOME/.rbenv/bin"
 export PYENV_ROOT="$HOME/.pyenv"
 _extend_path "$PYENV_ROOT/bin"
+# Needed for android development
+export ANDROID_HOME=$HOME/Library/Android/sdk
 
 # Pyenv (must be before oh-my-zsh plugin)
 if command -v pyenv >/dev/null 2>&1; then
@@ -175,6 +177,8 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/rbenv
     zgen oh-my-zsh plugins/per-directory-history
     zgen oh-my-zsh plugins/pyenv
+    # Needed for android development (java 17.0)
+    zgen oh-my-zsh plugins/jenv
 
     # Custom plugins
     zgen load chriskempson/base16-shell
