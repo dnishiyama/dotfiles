@@ -184,12 +184,14 @@ with-prod() {
 gai() {
     # Function to generate commit message
     generate_commit_message() {
+        local additional_context="$1"
         git diff --cached | llm "
 Below is a diff of all staged changes, coming from the command:
 \`\`\`
 git diff --cached
 \`\`\`
-Please generate a concise, one-line commit message for these changes."
+Please generate a commit message for these changes where the top line is an overview and then each bullet point underneath that describes each individual change.
+Additional context or instructions: $additional_context"
     }
 
     # Function to read user input compatibly with both Bash and Zsh
@@ -203,14 +205,15 @@ Please generate a concise, one-line commit message for these changes."
     }
 
     # Main script
+    local additional_context=""
     echo "Generating AI-powered commit message..."
-    commit_message=$(generate_commit_message)
+    commit_message=$(generate_commit_message "$additional_context")
 
     while true; do
         echo -e "\nProposed commit message:"
         echo "$commit_message"
 
-        read_input "Do you want to (a)ccept, (e)dit, (r)egenerate, or (c)ancel? "
+        read_input "Do you want to (a)ccept, (e)dit, (r)egenerate, (c)ancel, or provide (n)ew context? "
         choice=$REPLY
 
         case "$choice" in
@@ -236,7 +239,13 @@ Please generate a concise, one-line commit message for these changes."
                 ;;
             r|R )
                 echo "Regenerating commit message..."
-                commit_message=$(generate_commit_message)
+                commit_message=$(generate_commit_message "$additional_context")
+                ;;
+            n|N )
+                read_input "Enter additional context or instructions: "
+                additional_context=$REPLY
+                echo "Regenerating commit message with new context..."
+                commit_message=$(generate_commit_message "$additional_context")
                 ;;
             c|C )
                 echo "Commit cancelled."
