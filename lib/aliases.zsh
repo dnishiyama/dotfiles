@@ -70,6 +70,9 @@ alias ybw="yarn build:watch"
 alias yba="yarn build:all"
 alias ytw="yarn test:watch"
 
+# easier reload shell
+alias rls="exec zsh"
+
 # Use tldr as help util
 if _exists tldr; then
   alias help="tldr"
