@@ -33,6 +33,10 @@ unsetopt HIST_IGNORE_ALL_DUPS
 # Environment
 # ------------------------------------------------------------------------------
 
+# direnv fix
+# https://github.com/ptavares/zsh-direnv
+source ~/.zsh-direnv/zsh-direnv.plugin.zsh
+
 # Export path to root of dotfiles repo
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
@@ -66,15 +70,20 @@ _extend_path "$HOME/.bun/bin"
 # Needed for ios pod installs
 # https://stackoverflow.com/questions/64901180/how-to-run-cocoapods-on-apple-silicon-m1?rq=3
 _extend_path "$HOME/.rbenv/bin"
-export PYENV_ROOT="$HOME/.pyenv"
-_extend_path "$PYENV_ROOT/bin"
+# export PYENV_ROOT="$HOME/.pyenv"
+# _extend_path "$PYENV_ROOT/bin"
 # Needed for android development
 export ANDROID_HOME=$HOME/Library/Android/sdk
 
+_extend_path "/opt/homebrew/opt/mysql@8.4/bin"
+
+# Python from brew https://stackoverflow.com/questions/5157678/how-do-i-use-brew-installed-python-as-the-default-python
+_extend_path "/opt/homebrew/opt/python/libexec/bin"
+
 # Pyenv (must be before oh-my-zsh plugin)
-if command -v pyenv >/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
+# if command -v pyenv >/dev/null 2>&1; then
+  # eval "$(pyenv init -)"
+# fi
 
 # Extend $NODE_PATH
 if [ -d ~/.npm-global ]; then
@@ -176,7 +185,8 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/deno
     zgen oh-my-zsh plugins/rbenv
     zgen oh-my-zsh plugins/per-directory-history
-    zgen oh-my-zsh plugins/pyenv
+    # Removing for uv
+    # zgen oh-my-zsh plugins/pyenv
     # Needed for android development (java 17.0)
     zgen oh-my-zsh plugins/jenv
 
@@ -213,6 +223,28 @@ fi
 if [[ -d "$SPACESHIP_PROJECT" ]]; then
   source "$SPACESHIP_PROJECT/spaceship.zsh"
 fi
+
+# Add custom pnpm section to Spaceship prompt
+# spaceship_pnpm() {
+#   # Check if pnpm is installed
+#   [[ -z "$(command -v pnpm)" ]] && return
+
+#   # Get pnpm version
+#   local pnpm_version=$(pnpm --version)
+
+#   # Display the section
+#   spaceship::section::v4 \
+#     --color "cyan" \
+#     --prefix "via " \
+#     --symbol "🅿 " \
+#     --value "v${pnpm_version}"
+# }
+
+# # Add pnpm section to Spaceship prompt order
+# SPACESHIP_PROMPT_ORDER=(
+#   pnpm
+#   # ... rest of your order ...
+# )
 
 # ------------------------------------------------------------------------------
 # Init tools
@@ -277,3 +309,7 @@ HISTORY_START_WITH_GLOBAL=true
 zvm_after_init_commands+=('source ~/.fzf.zsh')
 # Claude 3.5 recommendation to get ^G to work for insert mode in vi when first loading the directory
 zvm_after_init_commands+=('bindkey -M viins "^G" per-directory-history-toggle-history')
+
+# Initialize iterm2 shell integration
+. "$HOME/.cargo/env"
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
