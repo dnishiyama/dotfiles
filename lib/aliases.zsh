@@ -260,3 +260,122 @@ Additional context or instructions: $additional_context"
         esac
     done
 }
+
+TWILIO_AC_ZSH_SETUP_PATH=/Users/nish/.twilio-cli/autocomplete/zsh_setup && test -f $TWILIO_AC_ZSH_SETUP_PATH && source $TWILIO_AC_ZSH_SETUP_PATH; # twilio autocomplete setup
+
+twtext() {
+    local default_to="+19199176076"
+    
+    # Check if the first argument looks like a phone number
+    if [[ "$1" == +1[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] ]]; then
+        local to="$1"
+        shift
+    else
+        local to="$default_to"
+    fi
+
+    local body="$*"
+
+    if [[ -z "$body" ]]; then
+        echo "Usage: twtext [optional:+1##########] <message-body>"
+        echo 'Examples:'
+        echo '  twtext "Script complete."'
+        echo '  twtext +19195551234 "Sent to another number."'
+        return 1
+    fi
+
+    twilio api:core:messages:create \
+        --to "$to" \
+        --from "+19475006132" \
+        --body "$body"
+}
+
+
+# dget [-p|--project <slug>] <env> <VAR>
+# Prints the value of <VAR> from the specified Doppler config.
+# dget [-p|--project <slug>] <env> <VAR>
+# Prints the value of <VAR> from the specified Doppler config.
+dget() {
+    local proj="" cfg="" var="" env_in=""
+
+    # Help
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        cat <<'EOF'
+Usage:
+    dget [options] <env> <VAR>
+
+Options:
+    -p, --project <slug>     Override the Doppler project (also supports --project=<slug>)
+    -h, --help               Show this help
+
+Notes:
+    Known env aliases: dev | stg|stage|staging | prd|prod|production
+    Any other <env> (e.g., ci, test, qa) is passed through as the Doppler config
+    with a warning to stderr.
+
+Examples:
+    dget dev DATABASE_URL
+    dget -p sandlot-v2 stg DATABASE_URL
+    dget --project=sandlot-v2 prd API_KEY
+    dget ci SOME_VAR
+EOF
+        return 0
+    fi
+
+    # Flags
+    while [[ "$1" == -* ]]; do
+        case "$1" in
+            -p|--project)
+                [[ -n "$2" ]] || { echo "dget: missing value for $1" >&2; return 2; }
+                proj="$2"; shift 2 ;;
+            --project=*)
+                proj="${1#*=}"; shift ;;
+            --help|-h) return 0 ;;
+            --) shift; break ;;
+            *)
+                echo "dget: unknown option: $1" >&2; return 2 ;;
+        esac
+    done
+
+    # <env>
+    env_in="$1"
+    if [[ -z "$env_in" ]]; then
+        echo "dget: missing <env>" >&2
+        echo "usage: dget [-p|--project <slug>] <env> <VAR>" >&2
+        return 2
+    fi
+    shift
+
+    # Map known aliases; otherwise pass-through with warning
+    case "$env_in" in
+        dev) cfg="dev" ;;
+        stg|stage|staging) cfg="stg" ;;
+        prd|prod|production) cfg="prd" ;;
+        *)
+            cfg="$env_in"
+            echo "dget: warning: unrecognized env '${env_in}', using as Doppler config name" >&2
+            ;;
+    esac
+
+    # <VAR>
+    var="$1"
+    if [[ -z "$var" ]]; then
+        echo "dget: missing <VAR>" >&2
+        echo "usage: dget [-p|--project <slug>] <env> <VAR>" >&2
+        return 2
+    fi
+
+    # Build doppler args safely
+    local -a args=(run --config "$cfg")
+    [[ -n "$proj" ]] && args+=(--project "$proj")
+
+    # 🪶 Added echo for context (stderr)
+    val="$(doppler "${args[@]}" -- printenv "$var")" || return $?
+    if [[ -n "$proj" ]]; then
+        echo "dget: $proj $cfg $var is $val" >&2
+    else
+        echo "dget: $cfg $var is $val" >&2
+    fi
+
+    printf '%s\n' "$val"
+}

@@ -74,6 +74,7 @@ _extend_path "$HOME/.rbenv/bin"
 # _extend_path "$PYENV_ROOT/bin"
 # Needed for android development
 export ANDROID_HOME=$HOME/Library/Android/sdk
+_extend_path "$ANDROID_HOME/platform-tools"
 
 _extend_path "/opt/homebrew/opt/mysql@8.4/bin"
 
@@ -287,9 +288,9 @@ fi
 
 # Get all the DGN secrets
 if [ -f ~/.dgn_secrets ]; then
-  set -o allexport
+  #set -o allexport
   source ~/.dgn_secrets
-  set +o allexport
+  #set +o allexport
 fi
 
 if [ -f ~/.dgn_exports ]; then
