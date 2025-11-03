@@ -301,8 +301,6 @@ twtext() {
 
 # dget [-p|--project <slug>] <env> <VAR>
 # Prints the value of <VAR> from the specified Doppler config.
-# dget [-p|--project <slug>] <env> <VAR>
-# Prints the value of <VAR> from the specified Doppler config.
 dget() {
     local proj="" cfg="" var="" env_in=""
 
@@ -310,20 +308,27 @@ dget() {
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         cat <<'EOF'
 Usage:
-    dget [options] <env> <VAR>
+    dget [options] [env] <VAR>
 
 Options:
     -p, --project <slug>     Override the Doppler project (also supports --project=<slug>)
     -h, --help               Show this help
 
 Notes:
-    Known env aliases: dev | stg|stage|staging | prd|prod|production
+    <env> options:
+      - (omitted): Defaults to .env file in current directory
+      - .env* (any file starting with .): Read from that specific file
+      - dev | stg|stage|staging | prd|prod|production: Doppler configs
     Any other <env> (e.g., ci, test, qa) is passed through as the Doppler config
     with a warning to stderr.
 
 Examples:
-    dget dev DATABASE_URL
-    dget -p sandlot-v2 stg DATABASE_URL
+    dget DATABASE_URL                    # Uses .env (default)
+    dget .env DATABASE_URL               # Uses .env (explicit)
+    dget .env.prd DATABASE_URL           # Uses .env.prd
+    dget .env.dev DATABASE_URL           # Uses .env.dev
+    dget dev DATABASE_URL                # Uses Doppler dev config
+    dget -p sandlot-v2 stg DATABASE_URL  # Uses Doppler stg config
     dget --project=sandlot-v2 prd API_KEY
     dget ci SOME_VAR
 EOF
@@ -345,14 +350,50 @@ EOF
         esac
     done
 
-    # <env>
-    env_in="$1"
-    if [[ -z "$env_in" ]]; then
-        echo "dget: missing <env>" >&2
-        echo "usage: dget [-p|--project <slug>] <env> <VAR>" >&2
+    # <env> - defaults to "local" if not provided
+    env_in="${1:-.env}"
+    
+    # If only one arg provided, it's the VAR and env defaults to .env
+    if [[ -z "$2" ]]; then
+        var="$1"
+        env_in=".env"
+    else
+        shift
+        var="$1"
+    fi
+
+    # <VAR>
+    if [[ -z "$var" ]]; then
+        echo "dget: missing <VAR>" >&2
+        echo "usage: dget [-p|--project <slug>] [env] <VAR>" >&2
         return 2
     fi
-    shift
+
+    # Handle local file loading - anything starting with "."
+    local env_file=""
+    if [[ "$env_in" == .* ]]; then
+        env_file="$env_in"
+    fi
+
+    if [[ -n "$env_file" ]]; then
+        if [[ ! -f "$env_file" ]]; then
+            echo "dget: file '$env_file' not found in current directory" >&2
+            return 1
+        fi
+        
+        # Source the env file in a subshell and get the variable value
+        # This properly handles multiple definitions (last one wins), variable interpolation, etc.
+        val="$(set -a; source "$env_file" 2>/dev/null; printenv "$var")"
+        
+        if [[ -z "$val" ]]; then
+            echo "dget: variable '${var}' not found in $env_file" >&2
+            return 1
+        fi
+        
+        echo "dget: $env_file $var is $val" >&2
+        printf '%s\n' "$val"
+        return 0
+    fi
 
     # Map known aliases; otherwise pass-through with warning
     case "$env_in" in
@@ -364,14 +405,6 @@ EOF
             echo "dget: warning: unrecognized env '${env_in}', using as Doppler config name" >&2
             ;;
     esac
-
-    # <VAR>
-    var="$1"
-    if [[ -z "$var" ]]; then
-        echo "dget: missing <VAR>" >&2
-        echo "usage: dget [-p|--project <slug>] <env> <VAR>" >&2
-        return 2
-    fi
 
     # Build doppler args safely
     local -a args=(run --config "$cfg")
