@@ -194,7 +194,6 @@ if ! zgen saved; then
     
     zgen oh-my-zsh plugins/bun
     zgen oh-my-zsh plugins/tldr
-    zgen oh-my-zsh plugins/fzf
     zgen oh-my-zsh plugins/rbenv
     zgen oh-my-zsh plugins/jenv
 
@@ -214,7 +213,6 @@ if ! zgen saved; then
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions
-    zgen load Aloxaf/fzf-tab
 
     # Files
     zgen load $DOTFILES/lib
@@ -263,11 +261,6 @@ fi
 # Load additional zsh files
 # ------------------------------------------------------------------------------
 
-# Fuzzy finder bindings
-if [ -f "$HOME/.fzf.zsh" ]; then
-  source "$HOME/.fzf.zsh"
-fi
-
 # ------------------------------------------------------------------------------
 # Overrides
 # ------------------------------------------------------------------------------
@@ -293,15 +286,24 @@ fi
 
 # ------------------------------------------------------------------------------
 
-# Initialize fzf after zsh-vi-mode
 # https://github.com/jeffreytse/zsh-vi-mode/issues/24
 # Recommendation from Claude 3.5
 # AND THEN initialize per-directory-history
 HISTORY_START_WITH_GLOBAL=true
-zvm_after_init_commands+=('source ~/.fzf.zsh')
 # Claude 3.5 recommendation to get ^G to work for insert mode in vi when first loading the directory
-zvm_after_init_commands+=('bindkey -M viins "^G" per-directory-history-toggle-history')
+# zvm_after_init_commands+=('bindkey -M viins "^G" per-directory-history-toggle-history')
 
 # Initialize iterm2 shell integration
 . "$HOME/.cargo/env"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# Atuin - https://github.com/atuin/atuin
+# https://docs.atuin.sh/reference/list/
+. "$HOME/.atuin/bin/env"
+eval "$(atuin init zsh)"
+
+# Bind Atuin after zsh-vi-mode initializes to prevent it from being overridden
+zvm_after_init() {
+  bindkey '^r' atuin-search # ctrl-r
+  bindkey '^[[A' atuin-up-search # Up arrow
+}
