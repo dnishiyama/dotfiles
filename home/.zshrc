@@ -164,6 +164,7 @@ if ! zgen saved; then
     zgen oh-my-zsh
 
     # Oh-My-Zsh plugins
+    zgen oh-my-zsh plugins/brew
     zgen oh-my-zsh plugins/git
     zgen oh-my-zsh plugins/history-substring-search
     zgen oh-my-zsh plugins/sudo
@@ -260,6 +261,11 @@ fi
 # ------------------------------------------------------------------------------
 # Load additional zsh files
 # ------------------------------------------------------------------------------
+
+# OpenAI Codex CLI completions
+if _exists codex; then
+  eval "$(codex completion zsh)"
+fi
 
 # ------------------------------------------------------------------------------
 # Overrides
