@@ -302,7 +302,7 @@ twtext() {
 # dget [-p|--project <slug>] <env> <VAR>
 # Prints the value of <VAR> from the specified Doppler config.
 dget() {
-    local proj="" cfg="" var="" env_in=""
+    local proj="" cfg="" var="" env_in="" hide_output=""
 
     # Help
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
@@ -312,6 +312,7 @@ Usage:
 
 Options:
     -p, --project <slug>     Override the Doppler project (also supports --project=<slug>)
+    --hide                   Don't print the value to stderr
     -h, --help               Show this help
 
 Notes:
@@ -343,6 +344,8 @@ EOF
                 proj="$2"; shift 2 ;;
             --project=*)
                 proj="${1#*=}"; shift ;;
+            --hide)
+                hide_output="true"; shift ;;
             --help|-h) return 0 ;;
             --) shift; break ;;
             *)
@@ -390,7 +393,9 @@ EOF
             return 1
         fi
         
-        echo "dget: $env_file $var is $val" >&2
+        if [[ -z "$hide_output" ]]; then
+            echo "dget: $env_file $var is $val" >&2
+        fi
         printf '%s\n' "$val"
         return 0
     fi

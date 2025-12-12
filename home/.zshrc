@@ -300,10 +300,10 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 # Atuin - https://github.com/atuin/atuin
 # https://docs.atuin.sh/reference/list/
 . "$HOME/.atuin/bin/env"
-eval "$(atuin init zsh)"
+eval "$(atuin init zsh --disable-up-arrow)"
 
 # Bind Atuin after zsh-vi-mode initializes to prevent it from being overridden
 zvm_after_init() {
   bindkey '^r' atuin-search # ctrl-r
-  bindkey '^[[A' atuin-up-search # Up arrow
+  # bindkey '^[[A' atuin-up-search # Up arrow
 }
